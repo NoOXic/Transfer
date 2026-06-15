@@ -266,7 +266,103 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 ::-webkit-scrollbar-thumb:hover{background:var(--muted)}
 @media(max-width:1100px){.main{grid-template-columns:1fr}.detail-panel{position:static}}
-@media(max-width:700px){header,.controls,.main,.chart-wrap,.compare-wrap,.shortlist-wrap{padding-left:16px;padding-right:16px}.form-grid,.help-metric-grid{grid-template-columns:1fr}}
+
+/* ── TABLET (≤768px) ── */
+@media(max-width:768px){
+  header{padding:12px 16px 10px;position:relative}
+  .header-top{gap:10px}
+  .title-block h1{font-size:18px;letter-spacing:1px}
+  .header-right{gap:6px}
+  .stat-pill{padding:4px 8px}
+  .stat-pill .value{font-size:13px}
+  .tabs{padding:0 16px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab-btn{padding:10px 14px;font-size:12px;white-space:nowrap;flex-shrink:0}
+  .controls{padding:10px 16px;gap:8px}
+  .search-wrap{min-width:140px;max-width:100%;flex:1 1 140px}
+  .filter-group{gap:5px}
+  .filter-btn{font-size:11px;padding:4px 9px}
+  .tier-btn{font-size:11px;padding:4px 7px}
+  .sort-select{font-size:11px;padding:5px 8px}
+  .result-count{font-size:11px}
+  .main,.chart-wrap,.compare-wrap,.shortlist-wrap{padding-left:16px;padding-right:16px}
+  .form-grid,.help-metric-grid{grid-template-columns:1fr}
+  .thresholds-bar{padding:10px 16px;gap:14px}
+  .th-group{min-width:140px}
+  .shortlist-cards{grid-template-columns:1fr}
+}
+
+/* ── MOBILE (≤480px) ── */
+@media(max-width:480px){
+  header{padding:10px 12px 8px}
+  .title-block h1{font-size:15px}
+  .title-block p{display:none}
+  .header-right{gap:4px}
+  .stat-pill{padding:3px 7px}
+  .stat-pill .label{font-size:9px}
+  .stat-pill .value{font-size:12px}
+  .icon-btn{font-size:12px;padding:5px 8px}
+
+  /* hide less-critical pills on very small screens */
+  .stat-pill:nth-child(3),.stat-pill:nth-child(4){display:none}
+
+  .tabs{padding:0 12px}
+  .tab-btn{padding:9px 11px;font-size:11px}
+
+  .controls{padding:8px 12px;flex-direction:column;align-items:stretch;gap:8px}
+  .search-wrap{max-width:100%}
+  .filter-group{flex-wrap:wrap}
+  .result-count{margin-left:0;text-align:right}
+  .toggle-mode,.icon-btn[id="thresholdsBtn"]{flex:1}
+
+  /* TABLE — horizontal scroll with sticky server column */
+  .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:6px}
+  table{font-size:12px;min-width:520px}
+  thead th{padding:7px 8px;font-size:10px}
+  tbody td{padding:8px 8px}
+  .server-num{font-size:14px}
+  tbody tr td:nth-child(2){position:sticky;left:0;background:var(--bg);z-index:1}
+  tbody tr:hover td:nth-child(2){background:#0E1525}
+  tbody tr.selected td:nth-child(2){background:#1a1810}
+  .ko-bar{width:50px}
+  .bookmark-cell{width:28px;padding:0 2px!important}
+  .bm-btn{font-size:14px;padding:3px}
+
+  /* DETAIL PANEL */
+  .main{padding-left:12px;padding-right:12px;gap:12px}
+  .detail-body{padding:12px 14px}
+  .detail-header{padding:12px 14px}
+  .detail-header .server-title{font-size:20px}
+  .compare-table td,.compare-table th{font-size:11px;padding:5px 0}
+  .detail-actions{gap:6px}
+  .action-btn{font-size:11px;padding:6px 4px}
+
+  /* CHART */
+  .chart-wrap{padding:12px}
+  .chart-container{padding:12px 6px}
+  .chart-legend{gap:10px}
+  .legend-item{font-size:11px}
+
+  /* COMPARE */
+  .compare-wrap{padding:12px}
+  .cmp-table{font-size:11px}
+  .cmp-table th,.cmp-table td{padding:7px 10px}
+  .cmp-table td:first-child{width:90px}
+
+  /* SHORTLIST */
+  .shortlist-wrap{padding:12px}
+  .sl-card{padding:12px 14px}
+  .sl-server{font-size:18px}
+
+  /* MODALS */
+  .modal{padding:16px;border-radius:8px}
+  .help-modal{padding:18px 16px;border-radius:8px}
+  .help-modal h2{font-size:16px}
+
+  /* THRESHOLDS */
+  .thresholds-bar{padding:8px 12px;gap:10px}
+  .th-group{min-width:120px;flex:1 1 120px}
+}
 </style>
 </head>
 <body>
@@ -982,6 +1078,22 @@ function renderChart(){
     dot.addEventListener('mousemove', e=>{ tt.style.left=(e.clientX+14)+'px'; tt.style.top=(e.clientY-10)+'px'; });
     dot.addEventListener('mouseleave', ()=>{ dot.setAttribute('r','6'); tt.style.display='none'; });
     dot.addEventListener('click', ()=>{ selectedId=id; switchTab('table'); renderTable(); renderDetail(); });
+    dot.addEventListener('touchstart', e=>{
+      e.preventDefault();
+      const t=e.touches[0];
+      dot.setAttribute('r','9');
+      tt.innerHTML=`<div class="tt-server">SERVER ${s.server}</div>
+        <div class="tt-row"><span>KO Rating</span><span>${s.ko.toFixed(3)}</span></div>
+        <div class="tt-row"><span>Score</span><span>${calcScore(s)}/100</span></div>
+        <div class="tt-row"><span>Prep</span><span>${s.prepW}-${s.prepL} (${prepPct(s)}%)</span></div>
+        <div class="tt-row"><span>KS Tier</span><span>${s.tier}-Tier</span></div>
+        <div class="tt-row"><span>Guilds</span><span>${s.guilds}</span></div>
+        <div class="tt-row"><span>Verdict</span><span>${vLabel(s.verdict)}</span></div>`;
+      tt.style.left=Math.min(t.clientX+14, window.innerWidth-160)+'px';
+      tt.style.top=Math.max(t.clientY-60, 10)+'px';
+      tt.style.display='block';
+      setTimeout(()=>{ tt.style.display='none'; dot.setAttribute('r','6'); }, 2500);
+    }, {passive:false});
   });
 }
 
